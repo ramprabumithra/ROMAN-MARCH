@@ -16,7 +16,7 @@
 <br>
 
 <p align="center">
-  <img src="screenshots/select-screen.jpg" alt="Campaign select screen with laurel wreath emblem and seven historical campaigns" width="100%">
+  <img src="select-screen.jpg" alt="Campaign select screen with laurel wreath emblem and seven historical campaigns" width="100%">
 </p>
 
 <br>
@@ -30,7 +30,7 @@ Nothing is hidden. The whole theater is on the map, you can always see exactly w
 <br>
 
 <p align="center">
-  <img src="screenshots/briefing.jpg" alt="Briefing screen showing a randomly-generated Roman persona and mission text" width="100%">
+  <img src="briefing.jpg" alt="Briefing screen showing a randomly-generated Roman persona and mission text" width="100%">
 </p>
 
 <br>
@@ -49,7 +49,7 @@ Nothing is hidden. The whole theater is on the map, you can always see exactly w
 <br>
 
 <p align="center">
-  <img src="screenshots/gameplay.jpg" alt="Gameplay screen showing the map, road network, and a city's strategic value in the info panel" width="100%">
+  <img src="gameplay.jpg" alt="Gameplay screen showing the map, road network, and a city's strategic value in the info panel" width="100%">
 </p>
 
 <br>
