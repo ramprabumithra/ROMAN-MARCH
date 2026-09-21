@@ -63,8 +63,18 @@
     text-shadow: 0 2px 18px rgba(201,168,76,0.25); text-align:center; position:relative; z-index:1; }
   #selectScreen h1::after { content:''; display:block; width:100px; height:2px; margin:10px auto 0;
     background: linear-gradient(90deg, transparent, var(--gold), transparent); }
-  #selectScreen .subtitle { font-family: var(--serif-font); font-style:italic; color:#a9a196; margin-top:10px; margin-bottom:22px; letter-spacing:0.3px; font-size:0.98em; text-align:center; flex-shrink:0; position:relative; z-index:1; }
+  #selectScreen .subtitle { font-family: var(--serif-font); font-style:italic; color:#a9a196; margin-top:10px; margin-bottom:14px; letter-spacing:0.3px; font-size:0.98em; text-align:center; flex-shrink:0; position:relative; z-index:1; }
+  .selectIntroNote { max-width:680px; font-family: var(--serif-font); font-size:0.92em; color:#d9cfb8; text-align:center;
+    margin-bottom:24px; flex-shrink:0; position:relative; z-index:1; line-height:1.55;
+    background: linear-gradient(160deg, rgba(41,32,18,0.6), rgba(26,20,12,0.55)); border:1px solid rgba(201,168,76,0.35);
+    border-radius:6px; padding:14px 22px; box-shadow: 0 4px 18px rgba(0,0,0,0.35), inset 0 0 0 1px rgba(201,168,76,0.08); }
+  .selectIntroNote b { color:var(--gold-bright2); font-weight:700; }
   .campaignGrid { display:grid; grid-template-columns: repeat(auto-fit, minmax(280px,1fr)); gap:16px; max-width:1000px; width:100%; position:relative; z-index:1; }
+  .selectFooterNote { max-width:760px; width:100%; margin:28px auto 4px; padding-top:16px; border-top:1px solid rgba(201,168,76,0.18);
+    font-family: var(--serif-font); font-size:0.85em; line-height:1.55; color:#9a9284; text-align:center; position:relative; z-index:1; }
+  .selectFooterNote b { color:#c2b183; font-weight:600; }
+  .selectFooterNote a { color:var(--gold); text-decoration:none; border-bottom:1px solid rgba(201,168,76,0.4); }
+  .selectFooterNote a:hover { color:var(--gold-bright2); border-color:var(--gold-bright2); }
   .campaignCard { background: linear-gradient(160deg, #211a12, #1a1510 55%, #171310); border:1px solid #3a2f1f; border-radius:6px; padding:18px;
     cursor:pointer; transition: transform .15s, box-shadow .15s, border-color .15s; position:relative; overflow:hidden;
     box-shadow: inset 0 0 0 1px rgba(201,168,76,0.08); }
@@ -268,7 +278,9 @@
     </svg>
     <h1>ROME: THE LAST MARCH</h1>
     <div class="subtitle">Seven campaigns. One road each time. The enemy does not wait for you.</div>
+    <div class="selectIntroNote">Every city on this map carries a strategic value computed live from the road network &mdash; how big a crossroads it is, and how much of a chokepoint &mdash; using <b>degree</b> and <b>betweenness centrality</b>, the same measures of "who matters, and why" from Week 3 of a real network-science course. Click any city once you're in a campaign to see it for yourself. Full details below.</div>
     <div class="campaignGrid" id="campaignGrid"></div>
+    <div class="selectFooterNote">Every road on this map is a real Roman road, and every city's strategic value &mdash; how big a crossroads it is, how much of a chokepoint it is &mdash; is computed live from the road network rather than written in by hand. Clicking a city runs the count of roads meeting there (its <b>degree centrality</b>) and, over all 504 cities on the map, Brandes' algorithm to work out how often that city sits on the shortest route between two <i>other</i> cities (its <b>betweenness centrality</b>) &mdash; the same breadth-first search the game already uses to march you and the enemy across the map, just run once for every city instead of one route at a time. Both numbers are then ranked against every other city so the game can tell you a city is "busier than almost anywhere" instead of showing a bare score. These are the exact measures of "who matters, and why" covered in Week 3 of DTU's <a href="https://sunelehmann.com/socialgraphs2026-web/weeks/week3.html" target="_blank" rel="noopener">Social Graphs and Interactions</a> course.</div>
   </div>
 
   <div id="gameScreen">
@@ -341,6 +353,7 @@
       <p><b>Turns and marching:</b> click any city on the map, not just a next-door one, and you march immediately &mdash; there's no preview step that tells you the turn cost before you've committed to anything. If it's one road away, that's the whole turn. If it's further, the game runs the same breadth-first search (BFS) the enemy uses to plot the shortest known road route there, highlights it in blue, and marches the first leg right away; the enemy takes its real turn, and only then does it stop and ask whether to continue onto the next leg or stop where you are. Every hop plays out fully before the next is offered &mdash; you move, the enemy responds, you see exactly where it is &mdash; so you're always deciding with current information, never with a full turn-by-turn itinerary laid out in advance. The only way to find out how long a road actually is is to start marching it. Routes are now genuinely long: real roads that used to be a single click are broken up into their actual real waypoint towns along the way, and most campaigns now take well over a dozen real turns to complete, so a march across a theater is a real multi-turn journey full of real decision points, not one hop.</p>
       <p><b>The enemy moves too, using the same shortest-path search (breadth-first search, BFS) throughout:</b> at first it marches toward its own fixed objective by the shortest route, recomputed fresh every turn, and does not know or care where you are. But it is also checking, every turn, its own BFS distance to <i>you</i>. Come within 6 roads of it and it abandons its march entirely, switching permanently to hunting: from then on its shortest path is recalculated against your current position instead of its old objective, every single turn, so it adapts immediately to wherever you go next. Once it's hunting you, it never goes back to its old plan. The topbar flags this in red (&#9876; HUNTING YOU) the moment it happens.</p>
       <p><b>Where the actual decisions are:</b> the road network has real branching &mdash; most cities have three or more viable ways in or out, not one forced corridor, and the real waypoint towns that break up long roads are cross-linked to their neighbors on other nearby roads too, not just strung along a single dead-straight line &mdash; so the shortest BFS route to your objective is rarely the only sane one, and it's often not the safest. The whole map is one connected road network, so wherever you end up, some route to your objective always exists; the only real cost of a detour is the turns it spends. The enemy's route is just as visible to you as yours is to it: a dashed amber line traces its own live BFS path across the map at all times, recalculated fresh every turn from wherever it actually is &mdash; toward its objective normally, or straight at you the instant it starts hunting, when the line itself flares bright magenta and pulses faster. Watch that line shift in real time as you move, and choose a longer route that keeps you further from its path (and further than its detection radius) instead of blindly taking the fastest one. Since the starting layout is randomized every game, there's no single memorized route that always works.</p>
+      <p><b>Sizing up a city:</b> click any city and, below the usual facts about it, you'll see a line on its strategic value &mdash; something like "a major junction, 5 roads meeting here" followed by "a natural chokepoint: far more routes pass through here than through most cities." That isn't flavor text made up for the occasion: the first half is the city's plain road count, and the second is computed once, for all 504 cities, with Brandes' algorithm &mdash; the standard way to work out how often a city sits on the shortest route between two <i>other</i> cities, built on the same breadth-first search the game already uses for marching and for the enemy's route. Both numbers are then ranked against every other city on the map, which is what turns a raw count into a comparison like "far more than most" instead of a bare number. In network-science terms, these are a city's <b>degree centrality</b> (how many roads meet there) and <b>betweenness centrality</b> (how much of the province's traffic is forced through it) &mdash; the same measures of "who matters, and why" covered in Week 3 of DTU's Social Graphs and Interactions course (sunelehmann.com/socialgraphs2026-web). A high-betweenness city is worth thinking about even off the direct route: it's the kind of place a real Roman commander would garrison, because so much of the province's movement has nowhere else to go.</p>
       <p><b>Winning:</b> reach your objective city before the enemy reaches theirs, and before the enemy ever occupies the same city as you.</p>
       <p><b>Losing:</b> the enemy reaches its objective first (their goal is secured on schedule, the way it may have happened historically), the enemy catches you by ending up on your city (far more likely once it's hunting you), or you run out of turns.</p>
       <p>Every city on this map is a real place from the <b>Digital Atlas of the Roman Empire</b> (DARE, dare.ht.lu.se), the academic gazetteer behind the klokantech/roman-empire map project; 494 of the 504 cities use DARE's own surveyed coordinates directly, and the rest (a lake, a mountain pass, a river crossing, a stretch of open border country) are reconstructed because DARE doesn't carry a point for them. 398 of those 504 are waypoint towns added on top of the historical hub cities: 208 string out the longer roads between hubs, and a further 190 are real nearby places branched in specifically wherever a stretch would otherwise have been a forced single-file corridor with nothing else around to cross-link to &mdash; each one kept a real distance from its neighbors so the map stays readable rather than cluttered.</p>
@@ -684,6 +697,76 @@ GRAPH.nodes.forEach(n => adjacency[n.id] = []);
 GRAPH.edges.forEach(e => { adjacency[e.a].push(e.b); adjacency[e.b].push(e.a); });
 const edgeByPair = {};
 GRAPH.edges.forEach(e => { edgeByPair[e.a+'|'+e.b] = e; edgeByPair[e.b+'|'+e.a] = e; });
+
+// ---------- Node "strategic value" (degree & betweenness centrality) ----------
+// Every city's role in the road network - how many roads meet there, and how
+// often it sits on the shortest route between two OTHER cities - gets quietly
+// surfaced in the info panel (see showInfo). Betweenness is computed here
+// with Brandes' algorithm, built on the exact same breadth-first search
+// bfsPath uses for routing above: which road carries the most "traffic"
+// isn't a hand-placed hint, it falls straight out of the graph, the same way
+// a real network scientist would find it.
+const CENTRALITY = (function computeCentrality() {
+  const ids = GRAPH.nodes.map(n => n.id);
+  const degree = {};
+  ids.forEach(id => degree[id] = adjacency[id].length);
+
+  const betweenness = {};
+  ids.forEach(id => betweenness[id] = 0);
+
+  ids.forEach(s => {
+    const stack = [];
+    const pred = {}; ids.forEach(id => pred[id] = []);
+    const sigma = {}; ids.forEach(id => sigma[id] = 0); sigma[s] = 1;
+    const dist = {}; ids.forEach(id => dist[id] = -1); dist[s] = 0;
+    const queue = [s];
+    while (queue.length) {
+      const v = queue.shift();
+      stack.push(v);
+      for (const w of adjacency[v]) {
+        if (dist[w] < 0) { queue.push(w); dist[w] = dist[v] + 1; }
+        if (dist[w] === dist[v] + 1) { sigma[w] += sigma[v]; pred[w].push(v); }
+      }
+    }
+    const delta = {}; ids.forEach(id => delta[id] = 0);
+    while (stack.length) {
+      const w = stack.pop();
+      for (const v of pred[w]) delta[v] += (sigma[v] / sigma[w]) * (1 + delta[w]);
+      if (w !== s) betweenness[w] += delta[w];
+    }
+  });
+  ids.forEach(id => betweenness[id] /= 2); // undirected: each pair counted from both ends
+
+  // Turn raw scores into a 0..1 rank against every other city, so the flavor
+  // text below can say "busier than almost anywhere" instead of a bare number.
+  function percentileRanks(values) {
+    const sorted = ids.slice().sort((a, b) => values[a] - values[b]);
+    const rank = {};
+    sorted.forEach((id, i) => rank[id] = ids.length > 1 ? i / (ids.length - 1) : 1);
+    return rank;
+  }
+  return { degree, betweenness, degreeRank: percentileRanks(degree), betweennessRank: percentileRanks(betweenness) };
+})();
+
+function describeStrategicValue(id) {
+  const d = CENTRALITY.degree[id];
+  const dRank = CENTRALITY.degreeRank[id];
+  const bRank = CENTRALITY.betweennessRank[id];
+  const roadWord = d === 1 ? 'road' : 'roads';
+  let hub;
+  if (dRank > 0.95) hub = 'one of the great crossroads of the province, ' + d + ' ' + roadWord + ' converging here';
+  else if (dRank > 0.8) hub = 'a major junction, ' + d + ' ' + roadWord + ' meeting here';
+  else if (dRank > 0.5) hub = 'a modest crossroads of ' + d + ' ' + roadWord;
+  else hub = 'a quiet stop on ' + (d === 1 ? 'a single road' : d + ' roads');
+
+  let choke;
+  if (bRank > 0.97) choke = 'Command it, and you command how the whole province moves: an extraordinary share of every route runs through nowhere else.';
+  else if (bRank > 0.85) choke = 'A natural chokepoint - far more routes pass through here than through most cities.';
+  else if (bRank > 0.5) choke = 'The odd route is funneled through here, though rarely the only way through.';
+  else choke = "Rarely on anyone's way to somewhere else.";
+
+  return hub.charAt(0).toUpperCase() + hub.slice(1) + '. ' + choke;
+}
 
 function bfsPath(start, goal) {
   if (start === goal) return [start];
@@ -1575,6 +1658,8 @@ function showInfo(id) {
   panel.innerHTML = '<h3>' + id + '</h3>' +
     '<div>Lat/Lon: ' + n.lat.toFixed(2) + ', ' + n.lon.toFixed(2) + '</div>' +
     '<div style="margin-top:4px; opacity:0.8;">Source: ' + source + '</div>' +
+    '<div style="margin-top:8px;">' + describeStrategicValue(id) + '</div>' +
+    '<div style="margin-top:2px; opacity:0.55; font-size:0.85em; font-style:italic;">Road count and route-traffic - degree and betweenness centrality, for anyone counting.</div>' +
     '<div style="margin-top:6px;"><a href="https://en.wikipedia.org/wiki/' + wikiName + '" target="_blank" rel="noopener">Look up on Wikipedia &#8594;</a></div>';
 }
 
