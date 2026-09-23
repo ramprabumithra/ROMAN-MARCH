@@ -121,8 +121,6 @@
   .roadLine.walked { stroke: var(--trail); stroke-width:3; stroke-dasharray: 0.5 6; stroke-linecap:round; opacity:0.95; }
   .trailDot { fill: var(--trail); stroke:#fff9ec; stroke-width:1.2; }
   .trailNum { fill:#fff9ec; font-weight:700; text-anchor:middle; dominant-baseline:central; pointer-events:none; font-family: -apple-system, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif; }
-  .roadLine.planned { stroke:#1c4fd6; stroke-width:3.4; stroke-dasharray:2 6; opacity:1; pointer-events:none; animation: marchdash 0.9s linear infinite; }
-  @keyframes marchdash { to { stroke-dashoffset: -16; } }
   .roadLine.enemyRoute { stroke:#d98a2b; stroke-width:2.8; stroke-dasharray:1 7; opacity:0.9; pointer-events:none;
     filter: drop-shadow(0 0 2px rgba(217,138,43,0.6)); animation: marchdashRev 1.1s linear infinite; }
   .roadLine.enemyRoute.hunting { stroke:#e6317a; stroke-width:3.6; opacity:1; animation-duration: 0.55s;
@@ -132,8 +130,6 @@
   .nodeGroup { cursor:pointer; }
   .nodeDot { fill:#ffffff; stroke:#333; stroke-width:1.1; cursor:pointer; }
   .nodeDot.reachable { stroke:var(--accent); stroke-width:2.6; filter: drop-shadow(0 0 3px rgba(42,125,225,0.7)); }
-  .nodeDot.onRoute { stroke:#1c4fd6; stroke-width:2.6; filter: drop-shadow(0 0 4px rgba(28,79,214,0.85)); }
-  .nodeDot.routeEnd { fill:#dce8ff !important; }
   .nodeDot.playerHere { fill: #f2b705 !important; stroke:#7a5c00; stroke-width:2; }
   .nodeDot.enemyHere { fill: #d1372a !important; stroke:#6b1a10; stroke-width:2; }
   .nodeDot.playerTarget { stroke:#164a1a; stroke-width:2.4; }
@@ -149,12 +145,6 @@
   .nodeLabel.playerLabel { fill:#8a6600; }
   .nodeLabel.enemyLabel { fill:#a8281a; }
   .nodeLabel.objectiveLabel { fill:#1a4a20; font-size:15.5px; font-weight:800; }
-  #infoPanel .hops { font-size:0.85em; opacity:0.85; margin:6px 0 10px; line-height:1.5; }
-  #infoPanel .btnRow { display:flex; gap:8px; margin-top:4px; }
-  #infoPanel .btnRow button { flex:1; border:none; border-radius:6px; padding:8px 10px; font-family:inherit; font-weight:600; cursor:pointer; }
-  #infoPanel #marchBtn { background:var(--accent); color:#fff; }
-  #infoPanel #cancelRouteBtn { background:#33404e; color:#ddd; }
-  #infoPanel .noRoute { color:#c85a3a; margin-top:6px; }
   .flagTarget { font-size:20px; pointer-events:none; }
 
   #sidebar { width:340px; background:#1c222b; color:#eee; display:flex; flex-direction:column; border-left:1px solid #2c3540; min-height:0; }
@@ -311,7 +301,7 @@
           <div><span class="sw" style="background:#9c4a86;"></span> Contested (both racing here)</div>
           <div style="margin-top:4px; border-top:1px solid #eee; padding-top:4px;">Solid red road = attested in DARE. Dashed = reconstructed.</div>
           <div>Blue-ringed city = one road away, click to march.</div>
-          <div>Click any other city to plot a BFS route there.</div>
+          <div>Any other city can only be clicked for information &ndash; you build your own route one road at a time.</div>
           <div style="margin-top:4px; border-top:1px solid #eee; padding-top:4px;"><span class="sw" style="background:#8a5a2b;"></span> Your march trail, numbered by turn</div>
           <div><span class="sw" style="background:#d98a2b;"></span> Enemy's live route (its own BFS, recalculated every turn; flares magenta once hunting)</div>
         </div>
@@ -340,7 +330,7 @@
       </div>
       <div id="sidebar">
         <div id="logPanel"></div>
-        <div id="infoPanel"><h3>Select a city</h3><div>Click any city to see what's known about it or, if it's not next door, to plot a BFS route there.</div></div>
+        <div id="infoPanel"><h3>Select a city</h3><div>Click any city to see what's known about it. Only a city one road away can be marched to.</div></div>
       </div>
     </div>
   </div>
@@ -350,9 +340,9 @@
       <h2>How this campaign works</h2>
       <p>You play a Roman sent ahead of the main force &mdash; a legionary officer, a camp scribe, a camp cook, a praetor, or a consul, drawn at random each time you start or restart a campaign, with a name and a portrait to match. Whoever you are this time, the whole theater is on the map at once and you always see exactly where the enemy is &mdash; nothing is hidden. What moves is you, and what moves against you is the enemy force named in the briefing. Both of your starting positions are also drawn fresh from a pool of plausible spots every time, so the map layout you're looking at, and the safe route through it, won't be the same twice.</p>
       <p><b>Reading the map:</b> every city is shown as a dot with its name labeled, just like the source DARE webmap. When two names would overlap at the current zoom, the less important one steps aside &mdash; but you, the enemy, both objectives, and anywhere you can march to this turn are always labeled no matter how tight the map gets. Your own objective gets a pulsing &#127937; ring so it's never in doubt which city you're actually racing toward. A blue ring means you can click that city to march there this turn. Use the theater/world toggle (top-left) or the target/grid buttons (top-right) to switch between this campaign's default zoomed-in view and the entire map. The most important thing that just happened is always posted as a banner across the top of the screen, right under the title bar &mdash; the sidebar log underneath keeps the full turn-by-turn history if you want to scroll back through it. Every road you've actually marched down stays traced on the map in a small brown trail, each stop numbered by the turn you reached it, so you can always see your own route through the theater at a glance, the way a real campaign map would mark it.</p>
-      <p><b>Turns and marching:</b> click any city on the map, not just a next-door one, and you march immediately &mdash; there's no preview step that tells you the turn cost before you've committed to anything. If it's one road away, that's the whole turn. If it's further, the game runs the same breadth-first search (BFS) the enemy uses to plot the shortest known road route there, highlights it in blue, and marches the first leg right away; the enemy takes its real turn, and only then does it stop and ask whether to continue onto the next leg or stop where you are. Every hop plays out fully before the next is offered &mdash; you move, the enemy responds, you see exactly where it is &mdash; so you're always deciding with current information, never with a full turn-by-turn itinerary laid out in advance. The only way to find out how long a road actually is is to start marching it. Routes are now genuinely long: real roads that used to be a single click are broken up into their actual real waypoint towns along the way, and most campaigns now take well over a dozen real turns to complete, so a march across a theater is a real multi-turn journey full of real decision points, not one hop.</p>
+      <p><b>Turns and marching:</b> you can only ever march to a city one road away &mdash; the ones ringed in blue on the map. Click one and you march there immediately, the enemy takes its real turn in response, and that's the whole turn. Click any other city, however close it looks, and nothing happens except its information showing in the panel on the right: there is no computed route, no shortest-path shortcut to a distant destination, and no way to see how many roads something is before you've actually walked there one at a time. A long march is built entirely by you, one adjacent city after another, deciding fresh each time with full knowledge of where the enemy just moved to. Routes are genuinely long: real roads that used to be a single click are broken up into their actual real waypoint towns along the way, and most campaigns now take well over a dozen real turns to complete, so crossing a theater is a real multi-turn journey made of real decisions at every single step, not one click to a destination.</p>
       <p><b>The enemy moves too, using the same shortest-path search (breadth-first search, BFS) throughout:</b> at first it marches toward its own fixed objective by the shortest route, recomputed fresh every turn, and does not know or care where you are. But it is also checking, every turn, its own BFS distance to <i>you</i>. Come within 6 roads of it and it abandons its march entirely, switching permanently to hunting: from then on its shortest path is recalculated against your current position instead of its old objective, every single turn, so it adapts immediately to wherever you go next. Once it's hunting you, it never goes back to its old plan. The topbar flags this in red (&#9876; HUNTING YOU) the moment it happens.</p>
-      <p><b>Where the actual decisions are:</b> the road network has real branching &mdash; most cities have three or more viable ways in or out, not one forced corridor, and the real waypoint towns that break up long roads are cross-linked to their neighbors on other nearby roads too, not just strung along a single dead-straight line &mdash; so the shortest BFS route to your objective is rarely the only sane one, and it's often not the safest. The whole map is one connected road network, so wherever you end up, some route to your objective always exists; the only real cost of a detour is the turns it spends. The enemy's route is just as visible to you as yours is to it: a dashed amber line traces its own live BFS path across the map at all times, recalculated fresh every turn from wherever it actually is &mdash; toward its objective normally, or straight at you the instant it starts hunting, when the line itself flares bright magenta and pulses faster. Watch that line shift in real time as you move, and choose a longer route that keeps you further from its path (and further than its detection radius) instead of blindly taking the fastest one. Since the starting layout is randomized every game, there's no single memorized route that always works.</p>
+      <p><b>Where the actual decisions are:</b> the road network has real branching &mdash; most cities have three or more viable ways in or out, not one forced corridor, and the real waypoint towns that break up long roads are cross-linked to their neighbors on other nearby roads too, not just strung along a single dead-straight line &mdash; so the shortest way toward your objective is rarely the only sane one to actually take, and it's often not the safest. Because you're choosing every single hop yourself, that choice is entirely yours to make, turn by turn: the whole map is one connected road network, so wherever you end up, some way through to your objective always exists, and the only real cost of a detour is the turns it spends. The enemy's route is visible to you the whole time it's making its own choices for you to react to: a dashed amber line traces its live shortest-path route across the map at all times, recalculated fresh every turn from wherever it actually is &mdash; toward its objective normally, or straight at you the instant it starts hunting, when the line itself flares bright magenta and pulses faster. Watch that line shift in real time as you move, and choose a longer road that keeps you further from its path (and further than its detection radius) instead of blindly taking whichever neighbor looks fastest. Since the starting layout is randomized every game, there's no single memorized route that always works.</p>
       <p><b>Sizing up a city:</b> click any city and, below the usual facts about it, you'll see a line on its strategic value &mdash; something like "a major junction, 5 roads meeting here" followed by "a natural chokepoint: far more routes pass through here than through most cities." That isn't flavor text made up for the occasion: the first half is the city's plain road count, and the second is computed once, for all 504 cities, with Brandes' algorithm &mdash; the standard way to work out how often a city sits on the shortest route between two <i>other</i> cities, built on the same breadth-first search the game already uses for marching and for the enemy's route. Both numbers are then ranked against every other city on the map, which is what turns a raw count into a comparison like "far more than most" instead of a bare number. In network-science terms, these are a city's <b>degree centrality</b> (how many roads meet there) and <b>betweenness centrality</b> (how much of the province's traffic is forced through it) &mdash; the same measures of "who matters, and why" covered in Week 3 of DTU's Social Graphs and Interactions course (sunelehmann.com/socialgraphs2026-web). A high-betweenness city is worth thinking about even off the direct route: it's the kind of place a real Roman commander would garrison, because so much of the province's movement has nowhere else to go.</p>
       <p><b>Winning:</b> reach your objective city before the enemy reaches theirs, and before the enemy ever occupies the same city as you.</p>
       <p><b>Losing:</b> the enemy reaches its objective first (their goal is secured on schedule, the way it may have happened historically), the enemy catches you by ending up on your city (far more likely once it's hunting you), or you run out of turns.</p>
@@ -909,7 +899,6 @@ function startCampaign(key) {
     visitPath: [pos.start],
     hunting: false,
   };
-  plannedPath = null;
   document.getElementById('logPanel').innerHTML = '';
   document.getElementById('endOverlay').style.display = 'none';
   document.getElementById('selectScreen').style.display = 'none';
@@ -1051,7 +1040,6 @@ function updateTopbar() {
 function tryMove(destId) {
   if (state.over) return;
   if (!adjacency[state.playerPos].includes(destId)) return;
-  plannedPath = null;
   const from = state.playerPos;
   state.playerPos = destId;
   state.walkedEdges.add(from + '|' + destId);
@@ -1147,83 +1135,27 @@ function endGame(won, title, text) {
   document.getElementById('endOverlay').style.display = 'flex';
 }
 
-// ---------- BFS-based route planning: click ANY city, not just a next-door
-// one, and the game plots the shortest known road route there and marches
-// immediately - the same instant a single-hop click always has. There is no
-// preview step that tells you the turn cost before you've moved: the road
-// ahead is highlighted on the map exactly like always, but the only way to
-// find out how many turns a march actually takes is to start marching it.
-function planRouteTo(destId) {
+// ---------- Movement: only ever one road, one click ----------
+// Clicking a city one road away marches there immediately - the whole turn,
+// enemy response included. Clicking anything further away does nothing but
+// show what's known about that city, exactly like hovering over it. There is
+// no auto-routing, no computed shortest path to a distant destination, and no
+// preview of how many roads it would take to get there: the only route that
+// exists is the one you build yourself, one adjacent city at a time, and the
+// only way to find out how far something is is to walk there.
+function clickCity(destId) {
   if (!state || state.over) return;
-  if (destId === state.playerPos) { plannedPath = null; showInfo(destId); renderMap(false); return; }
-  const path = bfsPath(state.playerPos, destId);
-  if (!path) {
-    plannedPath = null;
-    showRouteUnreachable(destId);
-    renderMap(false);
-    return;
+  if (destId === state.playerPos) { showInfo(destId); return; }
+  if (adjacency[state.playerPos].includes(destId)) {
+    tryMove(destId); // advances one turn, runs the enemy's real turn, checks win/loss, re-renders
+  } else {
+    showInfo(destId);
   }
-  plannedPath = null;
-  executeHops(path.slice(1));
-}
-
-function cancelRoute() {
-  plannedPath = null;
-  renderMap(false);
-  showInfo(state.playerPos);
-}
-
-function confirmMarch() {
-  if (!plannedPath || plannedPath.length < 2) return;
-  const hops = plannedPath.slice(1);
-  plannedPath = null;
-  executeHops(hops);
-}
-
-// A multi-hop route now takes exactly one hop at a time: move, let the
-// enemy make its real turn, then STOP and show whatever's left of the
-// route instead of auto-playing the whole thing blind. The enemy's new
-// position is on the map before you commit to the next hop, so a long
-// march is a series of real decisions - you can bail or replan after
-// every single step - not one commitment locked in before you saw how
-// the enemy responded to your first move.
-function executeHops(hops) {
-  if (!hops.length || !state || state.over) { renderMap(false); return; }
-  const next = hops[0];
-  tryMove(next); // advances one turn, runs the enemy's real turn, checks win/loss, re-renders
-  if (!state || state.over) return;
-  const rest = hops.slice(1);
-  if (!rest.length) { showInfo(state.playerPos); return; }
-  plannedPath = [state.playerPos].concat(rest);
-  renderMap(false);
-  showContinuePrompt(plannedPath);
-}
-
-// No turn count anywhere here on purpose - you find out how far a road runs
-// by marching it, not by asking first. The map still shows you the next leg
-// of the road you're already committed to, same as it shows any other road.
-function showContinuePrompt(path) {
-  const panel = document.getElementById('infoPanel');
-  const dest = path[path.length - 1];
-  const nextStop = path[1];
-  panel.innerHTML = '<h3>On the road to ' + dest + '</h3>' +
-    '<div class="hops">Next stop: ' + nextStop + '</div>' +
-    '<div class="btnRow"><button id="marchBtn">Continue</button><button id="cancelRouteBtn">Stop here</button></div>';
-  document.getElementById('marchBtn').addEventListener('click', () => confirmMarch());
-  document.getElementById('cancelRouteBtn').addEventListener('click', cancelRoute);
-}
-
-function showRouteUnreachable(destId) {
-  const panel = document.getElementById('infoPanel');
-  const n = nodeById[destId];
-  panel.innerHTML = '<h3>' + destId + '</h3>' +
-    '<div class="noRoute">No known road route connects there from ' + state.playerPos + ' &mdash; this is a real gap in the DARE road data, not a bug.</div>';
 }
 
 // ---------- Map rendering (whole map always visible; pan/zoom on top) ----------
 let viewScale = 1, viewX = 0, viewY = 0;
 let dragging = false, dragStartX=0, dragStartY=0, dragOrigX=0, dragOrigY=0;
-let plannedPath = null; // array of city ids from state.playerPos to a clicked destination
 
 function fitView() {
   const wrap = document.getElementById('mapWrap');
@@ -1402,27 +1334,6 @@ function renderMap(initial) {
     g.appendChild(enemyRouteLayer);
   }
 
-  // ---- planned-route preview: the BFS path a clicked-but-not-yet-confirmed
-  // destination would take, drawn as an animated blue dashed overlay on top
-  // of the real roads so the whole multi-hop march is visible before you
-  // commit to it ----
-  if (plannedPath && plannedPath.length > 1) {
-    const routeLayer = document.createElementNS(NS,'g');
-    for (let i = 0; i < plannedPath.length - 1; i++) {
-      const a = plannedPath[i], b = plannedPath[i+1];
-      const e = edgeByPair[a+'|'+b];
-      const na = nodeById[a], nb = nodeById[b];
-      const pts = (e && e.verified && e.pathXY && e.pathXY.length > 1)
-        ? (e.a === a ? e.pathXY : e.pathXY.slice().reverse())
-        : [[na.x, na.y],[nb.x, nb.y]];
-      const poly = document.createElementNS(NS,'polyline');
-      poly.setAttribute('points', ptStr(pts));
-      poly.setAttribute('class', 'roadLine planned');
-      routeLayer.appendChild(poly);
-    }
-    g.appendChild(routeLayer);
-  }
-
   // ---- march trail: small numbered markers over cities you've actually
   // stopped at this campaign, in visit order - the kind of stage-by-stage
   // annotation a real general's campaign map carries, so your own path
@@ -1536,8 +1447,6 @@ function renderMap(initial) {
   // Priority order for city labels: story-critical cities first (always
   // placed, never culled), then everything else in the order the data gives
   // them - which is enough entropy to avoid every run looking identical.
-  const routeSet = new Set((plannedPath || []).slice(1));
-  const routeEnd = plannedPath && plannedPath.length > 1 ? plannedPath[plannedPath.length-1] : null;
   const priority = [];
   const rest = [];
   GRAPH.nodes.forEach(n => {
@@ -1546,8 +1455,7 @@ function renderMap(initial) {
     const isReachable = reachable.has(n.id) && !state.over;
     const isPlayerTarget = n.id === c.target;
     const isEnemyTarget = n.id === c.enemyTarget;
-    const onRoute = routeSet.has(n.id);
-    const important = isPlayer || isEnemy || isPlayerTarget || isEnemyTarget || isReachable || onRoute;
+    const important = isPlayer || isEnemy || isPlayerTarget || isEnemyTarget || isReachable;
     (important ? priority : rest).push(n);
   });
   // Only these get a label no matter what - everything else, including a
@@ -1557,8 +1465,8 @@ function renderMap(initial) {
   // dense, real stretches of road (lots of real towns close together)
   // unreadable - the blue ring already marks a reachable city as clickable
   // without needing its name to always be visible too.
-  function mustLabel(isPlayer, isEnemy, isPlayerTarget, isEnemyTarget, onRoute) {
-    return isPlayer || isEnemy || isPlayerTarget || isEnemyTarget || onRoute;
+  function mustLabel(isPlayer, isEnemy, isPlayerTarget, isEnemyTarget) {
+    return isPlayer || isEnemy || isPlayerTarget || isEnemyTarget;
   }
 
   // Node dots and their labels are sized in constant SCREEN pixels rather
@@ -1575,8 +1483,7 @@ function renderMap(initial) {
     const isReachable = reachable.has(n.id) && !state.over;
     const isPlayerTarget = n.id === c.target;
     const isEnemyTarget = n.id === c.enemyTarget;
-    const onRoute = routeSet.has(n.id);
-    const important = isPlayer || isEnemy || isPlayerTarget || isEnemyTarget || isReachable || onRoute;
+    const important = isPlayer || isEnemy || isPlayerTarget || isEnemyTarget || isReachable;
 
     // The objective gets a pulsing halo ring underneath its dot so it reads
     // as "the destination" at a glance, from any zoom level, without having
@@ -1595,9 +1502,8 @@ function renderMap(initial) {
     let rPx = 4;
     if (isPlayerTarget) rPx = 12;
     else if (isPlayer || isEnemy) rPx = 10;
-    else if (isReachable || n.id === routeEnd) rPx = 8;
+    else if (isReachable) rPx = 8;
     else if (isEnemyTarget) rPx = 9;
-    else if (onRoute) rPx = 6;
     const r = rPx / scaleForLabels;
     circle.setAttribute('r', r);
     circle.setAttribute('vector-effect', 'non-scaling-stroke');
@@ -1608,17 +1514,17 @@ function renderMap(initial) {
     if (isPlayer) fill = '#f2b705';
     if (isEnemy) fill = '#d1372a';
     circle.setAttribute('fill', fill);
-    let cssCls = 'nodeDot' + (isReachable ? ' reachable' : '') + (onRoute ? ' onRoute' : '') + (n.id === routeEnd ? ' routeEnd' : '') + (isPlayer ? ' playerHere' : '') + (isEnemy ? ' enemyHere' : '') + (isPlayerTarget ? ' playerTarget' : '') + (isEnemyTarget ? ' enemyTargetDot' : '');
+    let cssCls = 'nodeDot' + (isReachable ? ' reachable' : '') + (isPlayer ? ' playerHere' : '') + (isEnemy ? ' enemyHere' : '') + (isPlayerTarget ? ' playerTarget' : '') + (isEnemyTarget ? ' enemyTargetDot' : '');
     circle.setAttribute('class', cssCls);
     circle.dataset.id = n.id;
-    circle.addEventListener('click', () => planRouteTo(n.id));
-    circle.addEventListener('mouseenter', () => { if (!plannedPath) showInfo(n.id); });
+    circle.addEventListener('click', () => clickCity(n.id));
+    circle.addEventListener('mouseenter', () => showInfo(n.id));
     dotLayer.appendChild(circle);
 
-    const forceLabel = mustLabel(isPlayer, isEnemy, isPlayerTarget, isEnemyTarget, onRoute);
+    const forceLabel = mustLabel(isPlayer, isEnemy, isPlayerTarget, isEnemyTarget);
     const fontPx = isPlayerTarget ? 15.5 : (important ? 13.5 : 11.5);
     let cls = 'nodeLabel';
-    if (isReachable || n.id === routeEnd) cls += ' reachableLabel';
+    if (isReachable) cls += ' reachableLabel';
     else if (!important) cls += ' minor';
     if (important) cls += ' majorLabel';
     if (isPlayer) cls += ' playerLabel';
